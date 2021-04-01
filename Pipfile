@@ -1,0 +1,24 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+flask = "*"
+flask-jwt-extended = "*"
+bcrypt = "*"
+flask-restful = "*"
+python-dotenv = "*"
+flask-marshmallow = "*"
+flask-cors = "*"
+requests = "*"
+flask-sqlalchemy = "*"
+flask-migrate = "*"
+boto3 = "*"
+marshmallow-sqlalchemy = "*"
+psycopg2-binary = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.8"
