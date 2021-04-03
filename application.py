@@ -20,12 +20,13 @@ secret_key = os.environ['SECRET_KEY']
 connection_string = 'postgres://{}:{}@{}:{}/postgres'.format(master_user, master_ps, endpoint, port)
 
 application = Flask(__name__)
-CORS(application)
-application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-application.config['SQLALCHEMY_DATABASE_URI'] = connection_string
-application.secret_key = secret_key
-db.init_app(application)
-migrate = Migrate(application, db, compare_type=True)
+app = application
+CORS(app)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = connection_string
+app.secret_key = secret_key
+db.init_app(app)
+migrate = Migrate(app, db, compare_type=True)
 
 
 class FrontEnd(Resource):
@@ -33,17 +34,17 @@ class FrontEnd(Resource):
         return "Happy Budget app version 1.0"
 
 
-api = Api(application)
+api = Api(app)
 
-jwt = JWTManager(application)
+jwt = JWTManager(app)
 
 
-@application.before_first_request
+@app.before_first_request
 def create_table():
     db.create_all()
 
 
-@application.errorhandler(ValidationError)
+@app.errorhandler(ValidationError)
 def handle_marshmallow_validation_exception(err):
     return jsonify(err.messages), 400
 
@@ -94,5 +95,5 @@ api.add_resource(feedback.FeedbackList, '/feedbacks')
 if __name__ == '__main__':
     from security.db import db, ma
 
-    ma.init_app(application)
-    application.run(port=8000, debug=True, use_debugger=True)
+    ma.init_app(app)
+    app.run(port=8000, debug=True, use_debugger=True)
