@@ -1,7 +1,6 @@
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required,get_jwt_identity
 from flask import request
-from time import time
 import traceback
 
 from schemas.income import IncomeSchema

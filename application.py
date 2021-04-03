@@ -19,34 +19,40 @@ port = os.environ['RDS_PORT']
 secret_key = os.environ['SECRET_KEY']
 connection_string = 'postgres://{}:{}@{}:{}/postgres'.format(master_user, master_ps, endpoint, port)
 
-app = Flask(__name__)
-CORS(app)
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = connection_string
-app.secret_key = secret_key
-db.init_app(app)
-migrate = Migrate(app, db, compare_type=True)
+application = Flask(__name__)
+CORS(application)
+application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+application.config['SQLALCHEMY_DATABASE_URI'] = connection_string
+application.secret_key = secret_key
+db.init_app(application)
+migrate = Migrate(application, db, compare_type=True)
+
 
 class FrontEnd(Resource):
     def get(self):
-        return"Happy Budget app version 1.0"
+        return "Happy Budget app version 1.0"
 
-api = Api(app)
 
-jwt = JWTManager(app)
+api = Api(application)
 
-@app.before_first_request
+jwt = JWTManager(application)
+
+
+@application.before_first_request
 def create_table():
     db.create_all()
 
-@app.errorhandler(ValidationError)
+
+@application.errorhandler(ValidationError)
 def handle_marshmallow_validation_exception(err):
     return jsonify(err.messages), 400
+
 
 @jwt.token_in_blacklist_loader
 def check_if_token_in_blacklist(decrypted_token):
     jti = decrypted_token['jti']
     return blacklist.Blacklist.is_jti_blacklisted(jti)
+
 
 api.add_resource(FrontEnd, '/')
 # Authentication apis
@@ -87,5 +93,6 @@ api.add_resource(feedback.FeedbackList, '/feedbacks')
 
 if __name__ == '__main__':
     from security.db import db, ma
-    ma.init_app(app)
-    app.run(port=8000, debug=True, use_debugger=True)
+
+    ma.init_app(application)
+    application.run(port=8000, debug=True, use_debugger=True)
