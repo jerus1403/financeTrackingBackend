@@ -9,7 +9,6 @@ aws_region = os.environ['AWS_REGION']
 
 client = boto3.client('ses', aws_access_key_id=aws_access_key, aws_secret_access_key=aws_secret_key, region_name=aws_region)
 
-
 def aws_send_email(**kwargs):
     return client.send_email(
                 Destination={
