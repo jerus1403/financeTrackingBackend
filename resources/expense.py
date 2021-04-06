@@ -45,7 +45,8 @@ class ExpenseResource(Resource):
             expense.tag = expense_input['tag'].lower()
             expense.amount = expense_input['amount']
             expense.save()
-            return {'msg': EXPENSE_UPDATED, 'item': expense_input}, 200
+            expense_obj = expense_chema.dump(expense)
+            return {'msg': EXPENSE_UPDATED, 'item': expense_obj}, 200
         except:
             traceback.print_exc()
             return {'msg': ERROR}, 500

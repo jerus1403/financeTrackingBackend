@@ -39,14 +39,14 @@ class IncomeResource(Resource):
     def put(cls, income_id):
         income = IncomeModel.find_by_id(income_id)
         income_input = request.get_json()
-        # income_obj = income_schema.dump(income)
         if not income:
             return {'msg': INCOME_NOT_FOUND}, 404
         try:
             income.tag = income_input['tag'].lower()
             income.amount = income_input['amount']
             income.save()
-            return {'msg': INCOME_UPDATED, 'item': income_input}, 200
+            income_obj = income_schema.dump(income)
+            return {'msg': INCOME_UPDATED, 'item': income_obj}, 200
         except:
             traceback.print_exc()
             return {'msg': ERROR}, 500
