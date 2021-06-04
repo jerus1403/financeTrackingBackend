@@ -11,6 +11,7 @@ income_schema = IncomeSchema()
 
 INCOME_ADDED = 'Income added'
 ERROR = 'Something went wrong'
+NOT_FOUND = 'Not found'
 
 INCOME_NOT_FOUND = 'Income not found'
 INCOME_UPDATED = 'Income has been updated'
@@ -67,8 +68,29 @@ class IncomeList(Resource):
     def get(cls):
         user_id = get_jwt_identity()
         try:
-            income_list = income_list_schema.dump(IncomeModel.find_by_user_id(user_id))
+            data = IncomeModel.find_by_user_id(user_id)
+            income_list = income_list_schema.dump(data)
             return {'incomes': income_list}, 200
+        except:
+            traceback.print_exc()
+            return {'msg': ERROR}, 500
+
+
+class IncomeListByPage(Resource):
+    @classmethod
+    @jwt_required
+    def get(cls):
+        page = request.args.get("page", None)
+        page_num = int(page)
+        user_id = get_jwt_identity()
+        try:
+            data = IncomeModel.find_by_user_id(user_id, page_num)
+            total_page = data.pages
+            if page_num <= total_page:
+                income_list = income_list_schema.dump(data.items)
+                return {'incomes': income_list}, 200
+            else:
+                return {'msg': NOT_FOUND}, 404
         except:
             traceback.print_exc()
             return {'msg': ERROR}, 500
