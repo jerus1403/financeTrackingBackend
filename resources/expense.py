@@ -7,10 +7,11 @@ from schemas.expense import ExpenseSchema
 from models.expense import ExpenseModel
 
 expense_list_schema = ExpenseSchema(many=True)
-expense_chema = ExpenseSchema()
+expense_schema = ExpenseSchema()
 
 EXPENSE_ADDED = 'Expense added'
 ERROR = 'Something went wrong'
+NOT_FOUND = 'Not found'
 
 EXPENSE_NOT_FOUND = 'Expense not found'
 EXPENSE_UPDATED = 'Expense has been updated'
@@ -24,7 +25,7 @@ class CreateExpense(Resource):
         user_id = get_jwt_identity()
         expense_input = request.get_json()
         expense = ExpenseModel(expense_input['tag'].lower(), expense_input['amount'], user_id)
-        expense_obj = expense_chema.dump(expense)
+        expense_obj = expense_schema.dump(expense)
         try:
             expense.save()
             return {'msg': EXPENSE_ADDED, 'expense': expense_obj}, 200
@@ -45,7 +46,7 @@ class ExpenseResource(Resource):
             expense.tag = expense_input['tag'].lower()
             expense.amount = expense_input['amount']
             expense.save()
-            expense_obj = expense_chema.dump(expense)
+            expense_obj = expense_schema.dump(expense)
             return {'msg': EXPENSE_UPDATED, 'item': expense_obj}, 200
         except:
             traceback.print_exc()
@@ -69,6 +70,26 @@ class ExpenseList(Resource):
         try:
             expense_list = expense_list_schema.dump(ExpenseModel.find_by_user_id(user_id))
             return {'expenses': expense_list}, 200
+        except:
+            traceback.print_exc()
+            return {'msg': ERROR}, 500
+
+
+class ExpenseListByPage(Resource):
+    @classmethod
+    @jwt_required
+    def get(cls):
+        page = request.args.get("page", None)
+        page_num = int(page)
+        user_id = get_jwt_identity()
+        try:
+            data = ExpenseModel.find_by_user_id(user_id, page_num)
+            total_page = data.pages
+            if page_num <= total_page:
+                expense_list = expense_list_schema.dump(data.items)
+                return {'expenses': expense_list}, 200
+            else:
+                return {'msg': NOT_FOUND}, 404
         except:
             traceback.print_exc()
             return {'msg': ERROR}, 500

@@ -78,6 +78,7 @@ api.add_resource(user.ResetPassword, '/reset-password/<string:username>')
 api.add_resource(income.CreateIncome, '/create-income')
 api.add_resource(income.IncomeResource, '/income/<string:income_id>')
 api.add_resource(income.IncomeList, '/incomes')
+api.add_resource(income.IncomeListByPage, '/incomes/items')
 api.add_resource(income.IncomeListByTag, '/incomes-by-tag')
 api.add_resource(income.IncomeListByTimestamp, '/incomes-by-timestamp/<string:period>')
 
@@ -85,6 +86,7 @@ api.add_resource(income.IncomeListByTimestamp, '/incomes-by-timestamp/<string:pe
 api.add_resource(expense.CreateExpense, '/create-expense')
 api.add_resource(expense.ExpenseResource, '/expense/<string:expense_id>')
 api.add_resource(expense.ExpenseList, '/expenses')
+api.add_resource(expense.ExpenseListByPage, '/expenses/items')
 api.add_resource(expense.ExpenseListByTag, '/expenses-by-tag')
 api.add_resource(expense.ExpenseListByTimestamp, '/expenses-by-timestamp/<string:period>')
 
